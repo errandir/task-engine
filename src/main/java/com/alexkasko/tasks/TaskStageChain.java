@@ -149,9 +149,9 @@ public class TaskStageChain implements Serializable {
     }
 
     /**
-     * Inner implementation of stage
+     * Implementation of one task stage.
      */
-    protected static class Stage implements Serializable {
+    public static class Stage implements Serializable {
         private static final long serialVersionUID = 6127466720110180244L;
 
         private final String intermediate;
@@ -173,12 +173,18 @@ public class TaskStageChain implements Serializable {
             this.start = false;
         }
 
-        String getIntermediate() {
+        /**
+         * @return intermediate stage name, e.g. 'running', 'loading_data'
+         */
+        public String getIntermediate() {
             if(start) throw new IllegalArgumentException("Start stage: '" + intermediate + "' has no intermediate stage");
             return intermediate;
         }
 
-        String getCompleted() {
+        /**
+         * @return completed stage name, e.g. 'finished', 'data_loaded'
+         */
+        public String getCompleted() {
             return completed;
         }
 
