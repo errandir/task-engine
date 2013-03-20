@@ -29,6 +29,13 @@ public class TaskManagerHibernateImpl implements TaskManagerIface {
     private Session cs() {return sf.getCurrentSession();}
 
     @Override
+    @Transactional(readOnly = true)
+    @SuppressWarnings("unchecked")
+    public Collection<TaskImpl> getRunning() {
+        return cs().createQuery("from TaskImpl where status='SELECTED' or status='PROCESSING'").list();
+    }
+
+    @Override
     @Transactional
     @SuppressWarnings("unchecked")
     public Collection<TaskImpl> markProcessingAndLoad() {

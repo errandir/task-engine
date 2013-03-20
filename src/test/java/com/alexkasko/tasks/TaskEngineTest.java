@@ -141,6 +141,11 @@ public class TaskEngineTest {
         private long nextTaskId;
 
         @Override
+        public Collection<TestTask> getRunning() {
+            return ImmutableList.of();
+        }
+
+        @Override
         public Collection<TestTask> markProcessingAndLoad() {
             TestTask task = tasks.get(nextTaskId);
             task.changeStatus("processing");

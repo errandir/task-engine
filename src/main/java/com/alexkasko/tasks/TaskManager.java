@@ -11,6 +11,15 @@ import java.util.Collection;
  * @see Task
  */
 public interface TaskManager<T extends Task> {
+
+    /**
+     * This method is used to load tasks that seems to be running according to their state.
+     * Will be called at the {@link TaskEngine} startup.
+     *
+     * @return collection of tasks that seems to be running
+     */
+    Collection<? extends T> getRunning();
+
     /**
      * This method is used to load new and resumed tasks to run.
      * All returning tasks should be switched into 'processing' status in DB.

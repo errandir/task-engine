@@ -52,6 +52,32 @@ public class TaskEngine implements Runnable {
     }
 
     /**
+     * @param executor executor will be used to process separate stages
+     * @param manager tasks DAO for all task state operations
+     * @param provider stage processors provider
+     * @param action action to be applied at startup
+     */
+    public TaskEngine(Executor executor, TaskManager<? extends Task> manager, TaskProcessorProvider provider,
+                      StartupAction action) {
+        this(executor, manager, provider);
+        if (StartupAction.SUSPEND_RUNNUNG == action) suspendRunning();
+    }
+
+    private void suspendRunning() {
+        for (Task task : manager.getRunning()) {
+            String stage = task.getStageName();
+            TaskStageChain stageChain = task.stageChain();
+            TaskStageChain.Stage breakStage = stageChain.forName(stage);
+            manager.updateStatusSuspended(task.getId());
+            if (stage.equals(breakStage.getIntermediate())) {
+                TaskStageChain.Stage previousStage = stageChain.previous(breakStage);
+                manager.updateStage(task.getId(), previousStage.getCompleted());
+            }
+            logger.debug("Task was suspended on stage: '" + stage + "' at startup, id: '" + task.getId() + "'");
+        }
+    }
+
+    /**
      * Sends tasks provided by {@link TaskManager#markProcessingAndLoad()}
      * to execution
      *
@@ -196,5 +222,12 @@ public class TaskEngine implements Runnable {
             manager.updateStatusSuspended(task.getId());
             return true;
         }
+    }
+
+    /**
+     * Actions that could be applied at {@link TaskEngine} startup.
+     */
+    public static enum StartupAction {
+        SUSPEND_RUNNUNG;
     }
 }

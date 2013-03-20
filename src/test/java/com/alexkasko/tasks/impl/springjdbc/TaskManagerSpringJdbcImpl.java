@@ -37,6 +37,12 @@ public class TaskManagerSpringJdbcImpl implements TaskManagerIface {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Collection<TaskImpl> getRunning() {
+        return jt.getJdbcOperations().query("select * from tasks where status='SELECTED' or status='PROCESSING'", MAPPER);
+    }
+
+    @Override
     @Transactional
     public Collection<TaskImpl> markProcessingAndLoad() {
         // lock selected
